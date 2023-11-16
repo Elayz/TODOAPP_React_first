@@ -9,13 +9,11 @@ import Footer from "./footer";
 
 
 const Header = () => {
-    const [inputValue, setInputValue] = useState("");
-    const [components, setComponents] = useState([]);
+    const [inputValue = {val:''}, setInputValue] = useState("");
     const handleKeyDown = (e) => {
         if (e.key === "Enter") {
-            setComponents([...components, inputValue]);
+            setInputValue(e.target.value);
         }
-        setInputValue(""); // Сбрасываем значение поля ввода
     };
 
 
