@@ -11,11 +11,15 @@ export default class Header extends Component{
         let maxId = 0;
         this.state = {
             label: '',
-            inputValue:
+            currentValues:
                 [
                     {value: 'first', id:1, done: false},
                     {value: 'second', id:2, done: false},
                     {value: 'third', id:3, done: false},
+                ],
+            inputValue:
+                [
+
                 ],
             selected: {
                 all: true,
@@ -28,6 +32,8 @@ export default class Header extends Component{
                 {completed: ''}
             ],
         };
+        this.state.inputValue = this.state.currentValues
+
         this.updateData = (item) =>{
             this.setState(({inputValue}) => {
                 const newArray = [...inputValue];
@@ -62,7 +68,8 @@ export default class Header extends Component{
                     ...inputValue.slice(index+1),
                 ];
                 return{
-                    inputValue: newArray
+                    inputValue: newArray,
+                    currentValues: newArray
                 };
 
             })
@@ -108,16 +115,25 @@ export default class Header extends Component{
                 {active: ''},
                 {completed: ''}
             ]
-            console.log(e)
             switch (e.target.id) {
                 case 'all':
                     newState[0].all = 'selected'
+                    this.setState({
+                        inputValue: this.state.currentValues
+                    })
+                    console.log(this.state.inputValue)
                     break;
                 case 'active':
                     newState[1].active = 'selected'
-                    // if(e.style)
+                    this.setState({
+                        inputValue: this.state.currentValues.filter(el=>!el.done)
+                    })
+                    console.log(this.state.currentValues)
                     break;
                 case 'completed':
+                    this.setState({
+                        inputValue: this.state.currentValues.filter(el=>el.done)
+                    })
                     newState[2].completed = 'selected'
                     break;
             }
@@ -131,7 +147,13 @@ export default class Header extends Component{
 
     render() {
         const doneItemCount = this.state.inputValue.filter((el)=>el.done).length;
-        const leftItems = this.state.inputValue.length - doneItemCount;
+        let leftItems = 0
+        const leftItemsFilt = this.state.currentValues.map(el=> {
+            if(!el.done){
+                leftItems++
+            }
+        })
+        // this.state.inputValue.length - doneItemCount;
         return (
             <div>
                 <form className="header"
