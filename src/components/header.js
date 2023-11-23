@@ -35,24 +35,27 @@ export default class Header extends Component{
         this.state.inputValue = this.state.currentValues
 
         this.updateData = (item) =>{
-            this.setState(({inputValue}) => {
-                const newArray = [...inputValue];
-                newArray.push(item)
-                return{
-                    inputValue: newArray
-                };
-            })
-            this.forceUpdate()
-            // console.log(this.state.inputValue)
+            if(item.value !== ''){
+                this.setState(({inputValue}) => {
+                    const newArray = [...inputValue];
+                    newArray.push(item)
+                    return{
+                        inputValue: newArray,
+                        currentValues: newArray
+                    };
+                })
+                this.forceUpdate()
+            }
         }
         this.deleteItem = (id) =>{
-            this.setState(({inputValue}) =>{
-                const index = inputValue.findIndex((el) => el.id === id);
-                const before = inputValue.slice(0, index);
-                const after = inputValue.slice(index+1);
+            this.setState(({currentValues}) =>{
+                const index = currentValues.findIndex((el) => el.id === id);
+                const before = currentValues.slice(0, index);
+                const after = currentValues.slice(index+1);
                 const new_mass = [...before, ...after]
                 return{
-                    inputValue: new_mass
+                    inputValue: new_mass,
+                    currentValues: new_mass
                 }
             })
         };
@@ -97,17 +100,14 @@ export default class Header extends Component{
             })
         }
         this.deleteDoneItems = () =>{
-            this.state.inputValue.forEach(obj => {
-                if (!obj.done) {
-                    const a = this.state.inputValue.filter((doneItem)=> !doneItem.done)
-                    this.setState(() => {
-                        return{
-                            inputValue: a
-                        };
-                    })
-
-                }
-            });
+            const newItem = this.state.currentValues.filter((doneItem)=> !doneItem.done)
+            this.setState(() => {
+                return{
+                    currentValues: newItem,
+                    inputValue: newItem
+                };
+            })
+            this.forceUpdate()
         }
         this.changeSelected = (e) => {
             const newState = [
@@ -146,7 +146,7 @@ export default class Header extends Component{
 
 
     render() {
-        const doneItemCount = this.state.inputValue.filter((el)=>el.done).length;
+        const doneItemCount = this.state.currentValues.filter((el)=>el.done).length;
         let leftItems = 0
         const leftItemsFilt = this.state.currentValues.map(el=> {
             if(!el.done){
