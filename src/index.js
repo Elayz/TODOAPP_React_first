@@ -1,20 +1,17 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import ReactDOM from 'react-dom/client';
 import './index.css';
 import Header from "./components/header";
-import Completed from "./components/completed";
-import Editing from "./components/editing";
-import Active from "./components/active";
-import Footer from "./components/footer";
 
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
 
 root.render(
-        <section className="todoapp">
+        <div className="todoapp">
             <Header></Header>
-        </section>
+            {/*<Footer></Footer>*/}
+        </div>
 )
 
 

@@ -1,38 +1,176 @@
-import React, {useState} from "react";
-import Completed from "./completed";
+import React, {useState, Component} from "react";
 import Active from "./active";
-import Footer from "./footer";
-// import ChildComponent from './ChildComponent';
+import Filter from "./filter";
 
 
 
+export default class Header extends Component{
 
-
-const Header = () => {
-    const [inputValue = {val:''}, setInputValue] = useState("");
-    const handleKeyDown = (e) => {
-        if (e.key === "Enter") {
-            setInputValue(e.target.value);
+    constructor() {
+        super()
+        let maxId = 0;
+        this.state = {
+            label: '',
+            inputValue:
+                [
+                    {value: 'first', id:1, done: false},
+                    {value: 'second', id:2, done: false},
+                    {value: 'third', id:3, done: false},
+                ],
+            selected: {
+                all: true,
+                active: false,
+                completed: false
+            },
+            classes: [
+                {all: ''},
+                {active: ''},
+                {completed: ''}
+            ],
+        };
+        this.updateData = (item) =>{
+            this.setState(({inputValue}) => {
+                const newArray = [...inputValue];
+                newArray.push(item)
+                return{
+                    inputValue: newArray
+                };
+            })
+            this.forceUpdate()
+            // console.log(this.state.inputValue)
         }
-    };
+        this.deleteItem = (id) =>{
+            this.setState(({inputValue}) =>{
+                const index = inputValue.findIndex((el) => el.id === id);
+                const before = inputValue.slice(0, index);
+                const after = inputValue.slice(index+1);
+                const new_mass = [...before, ...after]
+                return{
+                    inputValue: new_mass
+                }
+            })
+        };
+        this.onToggleDone = (id) =>{
+            this.setState(({inputValue})=>{
+                const index = inputValue.findIndex((el) => el.id === id);
+                const oldItem = inputValue[index];
+                const newItem = {...oldItem, done: !oldItem.done}
+
+                const newArray = [
+                    ...inputValue.slice(0, index),
+                    newItem,
+                    ...inputValue.slice(index+1),
+                ];
+                return{
+                    inputValue: newArray
+                };
+
+            })
+        };
+        this.onLabelChange = (e) => {
+            this.setState({
+                label: e.target.value
+            })
+        };
+        this.onSubmit = (e) => {
+            this.state.inputValue.forEach(obj => {
+                if (obj.id > maxId) {
+                    maxId = obj.id;
+                }
+            });
+            e.preventDefault();
+            const newItem = {
+                value: this.state.label,
+                id: maxId + 1,
+                done: false
+            }
+            this.updateData(newItem)
+            this.setState({
+                label: ''
+            })
+        }
+        this.deleteDoneItems = () =>{
+            this.state.inputValue.forEach(obj => {
+                if (!obj.done) {
+                    const a = this.state.inputValue.filter((doneItem)=> !doneItem.done)
+                    this.setState(() => {
+                        return{
+                            inputValue: a
+                        };
+                    })
+
+                }
+            });
+        }
+        this.changeSelected = (e) => {
+            const newState = [
+                {all: ''},
+                {active: ''},
+                {completed: ''}
+            ]
+            console.log(e)
+            switch (e.target.id) {
+                case 'all':
+                    newState[0].all = 'selected'
+                    break;
+                case 'active':
+                    newState[1].active = 'selected'
+                    // if(e.style)
+                    break;
+                case 'completed':
+                    newState[2].completed = 'selected'
+                    break;
+            }
+            this.setState({
+                classes: newState
+            })
+        }
+    }
 
 
-    return (
-        <div>
-            <header className="header">
-                <h1>todos</h1>
-                <input onKeyDown={handleKeyDown} className="new-todo" placeholder="What needs to be done?" autoFocus></input>
+
+    render() {
+        const doneItemCount = this.state.inputValue.filter((el)=>el.done).length;
+        const leftItems = this.state.inputValue.length - doneItemCount;
+        return (
+            <div>
+                <form className="header"
+                      onSubmit={this.onSubmit}>
+                    <h1>todos</h1>
+                    <input
+                        className="new-todo"
+                        placeholder="What needs to be done?"
+                        autoFocus
+                        onChange={this.onLabelChange}
+                        value={this.state.label}
+                    ></input>
+                </form>
                 <section className="main">
-                    <ul className="todo-list">
-                        <Completed></Completed>
-                        {/*<Editing></Editing>*/}
-                        <Active inputValue = {inputValue}></Active>
-                    </ul>
-                    <Footer></Footer>
+                    <Active
+                        onToggleDone={this.onToggleDone}
+                        onDeleted={this.deleteItem}>{this.state.inputValue}
+
+                    </Active>
                 </section>
-            </header>
-        </div>
-    )
+                <footer className="footer">
+                    <span className="todo-count">{leftItems} items left</span>
+                    <Filter
+                        classes={this.state.classes}
+                        selected={this.state.selected}
+                        changeSelected={this.changeSelected}
+                    >
+                    </Filter>
+                    <button
+                        className="clear-completed"
+                        onClick={this.deleteDoneItems}
+                    >Clear completed
+                    </button>
+                </footer>
+            </div>
+
+        )
+    }
 }
 
-export default Header
+
+

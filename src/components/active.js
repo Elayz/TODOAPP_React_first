@@ -1,23 +1,28 @@
-import React from "react";
-// import './header.css'
+import React, {Component} from "react";
+import ActiveItem from "./active-item";
 
 
-const Active = (props) => {
-    return (
-        <li>
-            <div className="view">
-                <input className="toggle" type="checkbox"/>
-                    <label>
-                        <span className="description">{props.inputValue}</span>
-                        <span className="created">created 5 minutes ago</span>
-                    </label>
-                    <button className="icon icon-edit"></button>
-                    <button className="icon icon-destroy"></button>
-            </div>
-        </li>
-    )
+export default class Active extends Component{
+    render() {
+        const elsements = this.props.children.map((item)=>{
+            return(
+                <ActiveItem
+                    key={item.id}
+                    name={item.value}
+                    done={item.done}
+                    onDelete={()=> this.props.onDeleted(item.id)}
+                    onToggleDone={()=>this.props.onToggleDone(item.id)}>
+                </ActiveItem>
+            )
+        })
+        return (
+            <ul className="todo-list">
+                {elsements}
+            </ul>
+        )
+    }
 }
 
-// const inputToDoValue = document.get('toggle')
 
-export default Active
+
+
