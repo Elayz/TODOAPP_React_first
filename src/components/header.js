@@ -9,13 +9,14 @@ export default class Header extends Component{
     constructor() {
         super()
         let maxId = 0;
+        const dateNow = new Date()
         this.state = {
             label: '',
             currentValues:
                 [
-                    {value: 'first', id:1, done: false},
-                    {value: 'second', id:2, done: false},
-                    {value: 'third', id:3, done: false},
+                    {value: 'first', id:1, done: false, date:dateNow},
+                    {value: 'second', id:2, done: false, date:dateNow},
+                    {value: 'third', id:3, done: false, date:dateNow},
                 ],
             inputValue:
                 [
@@ -33,6 +34,7 @@ export default class Header extends Component{
             ],
         };
         this.state.inputValue = this.state.currentValues
+
 
         this.updateData = (item) =>{
             if(item.value !== ''){
@@ -89,10 +91,12 @@ export default class Header extends Component{
                 }
             });
             e.preventDefault();
+            const dateNoww = new Date()
             const newItem = {
                 value: this.state.label,
                 id: maxId + 1,
-                done: false
+                done: false,
+                date:dateNoww
             }
             this.updateData(newItem)
             this.setState({
@@ -121,14 +125,12 @@ export default class Header extends Component{
                     this.setState({
                         inputValue: this.state.currentValues
                     })
-                    console.log(this.state.inputValue)
                     break;
                 case 'active':
                     newState[1].active = 'selected'
                     this.setState({
                         inputValue: this.state.currentValues.filter(el=>!el.done)
                     })
-                    console.log(this.state.currentValues)
                     break;
                 case 'completed':
                     this.setState({
@@ -142,6 +144,7 @@ export default class Header extends Component{
             })
         }
     }
+
 
 
 
@@ -171,7 +174,6 @@ export default class Header extends Component{
                     <Active
                         onToggleDone={this.onToggleDone}
                         onDeleted={this.deleteItem}>{this.state.inputValue}
-
                     </Active>
                 </section>
                 <footer className="footer">

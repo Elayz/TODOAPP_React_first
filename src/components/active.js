@@ -11,7 +11,9 @@ export default class Active extends Component{
                     name={item.value}
                     done={item.done}
                     onDelete={()=> this.props.onDeleted(item.id)}
-                    onToggleDone={()=>this.props.onToggleDone(item.id)}>
+                    onToggleDone={()=>this.props.onToggleDone(item.id)}
+                    dateItem={item.date}
+                >
                 </ActiveItem>
             )
         })
@@ -21,7 +23,22 @@ export default class Active extends Component{
             </ul>
         )
     }
+    static propTypes={
+        children: (props, propName, componentName) =>{
+            const value = props[propName];
+            if(typeof value==='object'){
+                return null
+            }
+            console.log(props)
+            return new TypeError('в selected подаётся не object')
+        }
+    }
+    static defaultProps={
+        children: []
+    }
 }
+
+
 
 
 
