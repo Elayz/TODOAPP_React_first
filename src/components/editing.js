@@ -1,8 +1,7 @@
-import React from "react";
+import React from 'react';
 // import './header.css'
 
-const Editing = () => {
-    return (
+const Editing = () => (
         <li className="editing">
             <div className="view">
                 <input className="toggle" type="checkbox"></input>
@@ -15,7 +14,6 @@ const Editing = () => {
             </div>
             <input type="text" className="edit" value="Editing task"></input>
         </li>
-    )
-}
+);
 
-export default Editing
+export default Editing;

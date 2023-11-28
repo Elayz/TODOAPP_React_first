@@ -1,163 +1,216 @@
-import React, {useState, Component} from "react";
-import Active from "./active";
-import Filter from "./filter";
+import React, { Component } from 'react';
+import Active from './active';
+import Filter from './filter';
 
-
-
-export default class Header extends Component{
-
-    constructor() {
-        super()
-        let maxId = 0;
-        const dateNow = new Date()
-        this.state = {
-            label: '',
-            currentValues:
+export default class Header extends Component {
+  constructor() {
+    super();
+    let maxId = 0;
+    const dateNow = new Date();
+    this.state = {
+      label: '',
+      labelEdit: '',
+      currentValues:
                 [
-                    {value: 'first', id:1, done: false, date:dateNow},
-                    {value: 'second', id:2, done: false, date:dateNow},
-                    {value: 'third', id:3, done: false, date:dateNow},
+                  {
+                    value: 'first', id: 1, done: false, date: dateNow, onEdit: false,
+                  },
+                  {
+                    value: 'second', id: 2, done: false, date: dateNow, onEdit: false,
+                  },
+                  {
+                    value: 'third', id: 3, done: false, date: dateNow, onEdit: false,
+                  },
                 ],
-            inputValue:
+      inputValue:
                 [
 
                 ],
-            selected: {
-                all: true,
-                active: false,
-                completed: false
-            },
-            classes: [
-                {all: ''},
-                {active: ''},
-                {completed: ''}
-            ],
+      selected: {
+        all: true,
+        active: false,
+        completed: false,
+      },
+      classes: [
+        { all: '' },
+        { active: '' },
+        { completed: '' },
+      ],
+    };
+    this.state.inputValue = this.state.currentValues;
+
+    this.updateData = (item) => {
+      if (item.value !== '') {
+        this.setState(({ inputValue }) => {
+          const newArray = [...inputValue];
+          newArray.push(item);
+          return {
+            inputValue: newArray,
+            currentValues: newArray,
+          };
+        });
+        this.forceUpdate();
+      }
+    };
+    this.deleteItem = (id) => {
+      this.setState(({ currentValues }) => {
+        const index = currentValues.findIndex((el) => el.id === id);
+        const before = currentValues.slice(0, index);
+        const after = currentValues.slice(index + 1);
+        const newMass = [...before, ...after];
+        return {
+          inputValue: newMass,
+          currentValues: newMass,
         };
-        this.state.inputValue = this.state.currentValues
+      });
+    };
+    this.onToggleDone = (id) => {
+      this.setState(({ inputValue }) => {
+        const index = inputValue.findIndex((el) => el.id === id);
+        const oldItem = inputValue[index];
+        const newItem = { ...oldItem, done: !oldItem.done };
 
-
-        this.updateData = (item) =>{
-            if(item.value !== ''){
-                this.setState(({inputValue}) => {
-                    const newArray = [...inputValue];
-                    newArray.push(item)
-                    return{
-                        inputValue: newArray,
-                        currentValues: newArray
-                    };
-                })
-                this.forceUpdate()
-            }
-        }
-        this.deleteItem = (id) =>{
-            this.setState(({currentValues}) =>{
-                const index = currentValues.findIndex((el) => el.id === id);
-                const before = currentValues.slice(0, index);
-                const after = currentValues.slice(index+1);
-                const new_mass = [...before, ...after]
-                return{
-                    inputValue: new_mass,
-                    currentValues: new_mass
-                }
-            })
+        const newArray = [
+          ...inputValue.slice(0, index),
+          newItem,
+          ...inputValue.slice(index + 1),
+        ];
+        return {
+          inputValue: newArray,
+          currentValues: newArray,
         };
-        this.onToggleDone = (id) =>{
-            this.setState(({inputValue})=>{
-                const index = inputValue.findIndex((el) => el.id === id);
-                const oldItem = inputValue[index];
-                const newItem = {...oldItem, done: !oldItem.done}
-
-                const newArray = [
-                    ...inputValue.slice(0, index),
-                    newItem,
-                    ...inputValue.slice(index+1),
-                ];
-                return{
-                    inputValue: newArray,
-                    currentValues: newArray
-                };
-
-            })
+      });
+    };
+    this.onLabelChange = (e) => {
+      this.setState({
+        label: e.target.value,
+      });
+    };
+    this.onSubmit = (e) => {
+      this.state.inputValue.forEach((obj) => {
+        if (obj.id > maxId) {
+          maxId = obj.id;
+        }
+      });
+      e.preventDefault();
+      const dateNow = new Date();
+      const newItem = {
+        value: this.state.label,
+        id: maxId + 1,
+        done: false,
+        date: dateNow,
+        onEdit: false,
+      };
+      this.updateData(newItem);
+      this.setState({
+        label: '',
+      });
+    };
+    this.deleteDoneItems = () => {
+      const newItem = this.state.currentValues.filter((doneItem) => !doneItem.done);
+      this.setState(() => ({
+        currentValues: newItem,
+        inputValue: newItem,
+      }));
+      this.forceUpdate();
+    };
+    this.changeSelected = (e) => {
+      const newState = [
+        { all: '' },
+        { active: '' },
+        { completed: '' },
+      ];
+      switch (e.target.id) {
+        case 'all':
+          newState[0].all = 'selected';
+          this.setState({
+            inputValue: this.state.currentValues,
+          });
+          break;
+        case 'active':
+          newState[1].active = 'selected';
+          this.setState({
+            inputValue: this.state.currentValues.filter((el) => !el.done),
+          });
+          break;
+        case 'completed':
+          this.setState({
+            inputValue: this.state.currentValues.filter((el) => el.done),
+          });
+          newState[2].completed = 'selected';
+          break;
+      }
+      this.setState({
+        classes: newState,
+      });
+    };
+    this.onEditing = (id) => {
+      this.setState(() => {
+        const index = this.state.currentValues.findIndex((el) => el.id === id);
+        return {
+          labelEdit: this.state.currentValues[index].value,
         };
-        this.onLabelChange = (e) => {
-            this.setState({
-                label: e.target.value
-            })
+      });
+      this.setState(({ currentValues }) => {
+        const index = currentValues.findIndex((el) => el.id === id);
+        const oldItem = currentValues[index];
+        const newItem = {
+          ...oldItem,
+          onEdit: !oldItem.onEdit,
         };
-        this.onSubmit = (e) => {
-            this.state.inputValue.forEach(obj => {
-                if (obj.id > maxId) {
-                    maxId = obj.id;
-                }
-            });
-            e.preventDefault();
-            const dateNoww = new Date()
-            const newItem = {
-                value: this.state.label,
-                id: maxId + 1,
-                done: false,
-                date:dateNoww
-            }
-            this.updateData(newItem)
-            this.setState({
-                label: ''
-            })
-        }
-        this.deleteDoneItems = () =>{
-            const newItem = this.state.currentValues.filter((doneItem)=> !doneItem.done)
-            this.setState(() => {
-                return{
-                    currentValues: newItem,
-                    inputValue: newItem
-                };
-            })
-            this.forceUpdate()
-        }
-        this.changeSelected = (e) => {
-            const newState = [
-                {all: ''},
-                {active: ''},
-                {completed: ''}
-            ]
-            switch (e.target.id) {
-                case 'all':
-                    newState[0].all = 'selected'
-                    this.setState({
-                        inputValue: this.state.currentValues
-                    })
-                    break;
-                case 'active':
-                    newState[1].active = 'selected'
-                    this.setState({
-                        inputValue: this.state.currentValues.filter(el=>!el.done)
-                    })
-                    break;
-                case 'completed':
-                    this.setState({
-                        inputValue: this.state.currentValues.filter(el=>el.done)
-                    })
-                    newState[2].completed = 'selected'
-                    break;
-            }
-            this.setState({
-                classes: newState
-            })
-        }
-    }
+        const newArray = [
+          ...currentValues.slice(0, index),
+          newItem,
+          ...currentValues.slice(index + 1),
+        ];
+        return {
+          inputValue: newArray,
+          currentValues: newArray,
+        };
+      });
+    };
+    this.onEditingChange = (e) => {
+      this.setState({
+        labelEdit: e.target.value,
+      });
+    };
+    this.onEditFoo = (e) => {
+      e.preventDefault();
+      const itemID = e.target.id;
+      this.setState(({ currentValues }) => {
+        const index = currentValues.findIndex((el) => el.id === Number(itemID));
 
+        const oldItem = currentValues[index];
+        const newItem = {
+          ...oldItem,
+          onEdit: !oldItem.onEdit,
+          value: this.state.labelEdit,
+        };
+        const newArray = [
+          ...currentValues.slice(0, index),
+          newItem,
+          ...currentValues.slice(index + 1),
+        ];
+        return {
+          currentValues: newArray,
+          inputValue: newArray,
+        };
+      });
 
+      this.setState({
+        labelEdit: '',
+      });
+    };
+  }
 
-
-    render() {
-        const doneItemCount = this.state.currentValues.filter((el)=>el.done).length;
-        let leftItems = 0
-        const leftItemsFilt = this.state.currentValues.map(el=> {
-            if(!el.done){
-                leftItems++
-            }
-        })
-        // this.state.inputValue.length - doneItemCount;
-        return (
+  render() {
+    let leftItems = 0;
+    this.state.currentValues.map((el) => {
+      if (!el.done) {
+        leftItems++;
+      }
+    });
+    return (
             <div>
                 <form className="header"
                       onSubmit={this.onSubmit}>
@@ -172,8 +225,14 @@ export default class Header extends Component{
                 </form>
                 <section className="main">
                     <Active
+                        onEditing={this.onEditing}
                         onToggleDone={this.onToggleDone}
-                        onDeleted={this.deleteItem}>{this.state.inputValue}
+                        onDeleted={this.deleteItem}
+                        onEditingChange={this.onEditingChange}
+                        labelEdit={this.state.labelEdit}
+                        onEditFoo={this.onEditFoo}
+                    >
+                      {this.state.inputValue}
                     </Active>
                 </section>
                 <footer className="footer">
@@ -191,10 +250,6 @@ export default class Header extends Component{
                     </button>
                 </footer>
             </div>
-
-        )
-    }
+    );
+  }
 }
-
-
-

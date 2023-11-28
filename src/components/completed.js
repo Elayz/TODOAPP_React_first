@@ -1,8 +1,6 @@
-import React from "react";
-// import './header.css'
+import React from 'react';
 
-const Completed = () => {
-    return (
+const Completed = () => (
         <li className="completed">
             <div className="view">
                 <input className="toggle" type="checkbox"></input>
@@ -14,7 +12,6 @@ const Completed = () => {
                     <button className="icon icon-destroy"></button>
             </div>
         </li>
-    )
-}
+);
 
-export default Completed
+export default Completed;
