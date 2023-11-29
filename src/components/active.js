@@ -2,7 +2,6 @@ import React, {Component} from "react";
 import ActiveItem from "./active-item";
 
 export default class Active extends Component{
-
     render() {
         const elsements = this.props.children.map((item)=>{
             return(
