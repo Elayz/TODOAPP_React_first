@@ -6,6 +6,7 @@ export default class Header extends Component {
   constructor() {
     super();
     var m = 1;
+    var z = 2
     let maxId = 0;
     const dateNow = new Date();
     this.state = {
